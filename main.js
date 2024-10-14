@@ -1,6 +1,5 @@
 import './style.css'
 import * as THREE from 'three'
-import TWEEN from '@tweenjs/tween.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
@@ -10,7 +9,7 @@ import { RGBShiftShader } from 'three/examples/jsm/shaders/RGBShiftShader.js';
 
 const scene = new THREE.Scene()
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000)
-camera.position.set(0,1,4.5)
+camera.position.set(0,3,5)
 let clock = new THREE.Clock();
 
 let targetLookAt = new THREE.Vector3(); 
@@ -41,7 +40,8 @@ function moveCameraTo(targetPosition) {
 
 const renderer = new THREE.WebGLRenderer({
   canvas: document.querySelector("#bg"),
-  antialias: true 
+  antialias: true,
+  // powerPreference: "high-performance",
 })
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -73,9 +73,9 @@ scene.add(sun, ambientLight)
 const loader = new GLTFLoader()
 let mixer
 loader.load(
-  './models/shitty_model.gltf', 
+  './models/model.glb', 
   function (gltf) {
-    gltf.scene.position.set(-1,-1,0)
+    gltf.scene.position.set(-1,-1.45,0)
     if (gltf.animations && gltf.animations.length > 0) {
       mixer = new THREE.AnimationMixer(gltf.scene);
       gltf.animations.forEach((clip) => {
@@ -121,7 +121,7 @@ function addStar(){
   )
   star.velocity = windDirection.clone().add(randomVelocity)
 
-  star.trail = new Array(maxTrailLength).fill(new THREE.Vector3(0, 0, 0)); 
+  star.trail =[] 
   const trailGeometry = new THREE.BufferGeometry();
   // trailGeometry.setAttribute('position', new THREE.Float32BufferAttribute(new Float32Array(maxTrailLength * 3), 3));
   
@@ -144,23 +144,8 @@ const smoothingFactor = 0.05;
 
 function updateStarTrail(star) {
   const trail = star.trail;
-  const starPositionZ = star.position.z;
-  const cameraPositionZ = camera.position.z;
-
-  const zDistance = Math.abs(starPositionZ - cameraPositionZ);
-
-  const minTrailLength = 4;  // Minimum length for farthest stars
-  const maxTrailLength = 50;  // Maximum length for closest stars
-
-  const trailLength = THREE.MathUtils.clamp(
-    maxTrailLength - (zDistance ), // Adjust divisor as needed to scale effect
-    minTrailLength,
-    maxTrailLength
-  );
-  // console.log(trailLength)
   trail.push(star.position.clone());
-
-  if (trail.length > trailLength) {
+  if (trail.length > 30) {
     trail.shift();  
   }
   const positions = new Float32Array(star.trail.flatMap(p => [p.x, p.y, p.z]));
