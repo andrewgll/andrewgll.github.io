@@ -11,7 +11,15 @@ import { gsap } from 'gsap';
 
 const scene = new THREE.Scene()
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000)
-camera.position.set(0,3,5)
+
+const isMobile = /Android|iPhone|iPad|iPod|Opera Mini|IEMobile/i.test(navigator.userAgent);
+console.log(isMobile)
+if(isMobile){
+  camera.position.set(0,10,5)
+}
+else{
+  camera.position.set(200,10,5)
+}
 let clock = new THREE.Clock();
 
 
